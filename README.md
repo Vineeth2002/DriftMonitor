@@ -21,10 +21,8 @@ The system is engineered to be:
 ---
 
 ## 🌐 Live Demo (GitHub Pages)
-👉 **https://\<your-username>.github.io/DriftMonitor/**  
-(Replace after Pages is enabled.)
-
-The page updates automatically after each report build workflow.
+👉 **https://Vineeth2002.github.io/DriftMonitor/**  
+(Works after enabling GitHub Pages → source: `/docs`)
 
 ---
 
