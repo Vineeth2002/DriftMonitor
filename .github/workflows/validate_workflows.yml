@@ -32,55 +32,55 @@ jobs:
         run: |
           set -e
           python - <<'PY'
-import glob, yaml, sys, traceback, os, textwrap
+            import glob, yaml, sys, traceback, os, textwrap
 
-files = sorted(glob.glob('.github/workflows/*.yml') + glob.glob('.github/workflows/*.yaml'))
-if not files:
-    print("No workflow files found in .github/workflows/")
-    sys.exit(0)
+            files = sorted(glob.glob('.github/workflows/*.yml') + glob.glob('.github/workflows/*.yaml'))
+            if not files:
+                print("No workflow files found in .github/workflows/")
+                sys.exit(0)
 
-exit_code = 0
-for p in files:
-    print("\n" + "="*80)
-    print("Checking:", p)
-    print("-"*80)
-    try:
-        s = open(p, "r", encoding="utf-8").read()
-        yaml.safe_load(s)
-        print("PARSE OK")
-    except Exception as e:
-        exit_code = 1
-        print("PARSE ERROR:", e)
-        try:
-            err = str(e)
-            import re
-            m = re.search(r'line (\\d+)', err)
-            if m:
-                ln = int(m.group(1))
-                start = max(1, ln-4)
-                end = ln+4
-                print(f"\nContext (lines {start}-{end}):\n")
-                with open(p, "r", encoding="utf-8") as fh:
-                    for i, L in enumerate(fh, start=1):
-                        if start <= i <= end:
-                            prefix = f'{i:4d}: '
-                            if i == ln:
-                                print(prefix + ">> " + L.rstrip())
-                            else:
-                                print(prefix + "   " + L.rstrip())
+            exit_code = 0
+            for p in files:
+                print("\n" + "="*80)
+                print("Checking:", p)
+                print("-"*80)
+                try:
+                    s = open(p, "r", encoding="utf-8").read()
+                    yaml.safe_load(s)
+                    print("PARSE OK")
+                except Exception as e:
+                    exit_code = 1
+                    print("PARSE ERROR:", e)
+                    try:
+                        err = str(e)
+                        import re
+                        m = re.search(r'line (\\d+)', err)
+                        if m:
+                            ln = int(m.group(1))
+                            start = max(1, ln-4)
+                            end = ln+4
+                            print(f"\nContext (lines {start}-{end}):\n")
+                            with open(p, "r", encoding="utf-8") as fh:
+                                for i, L in enumerate(fh, start=1):
+                                    if start <= i <= end:
+                                        prefix = f'{i:4d}: '
+                                        if i == ln:
+                                            print(prefix + ">> " + L.rstrip())
+                                        else:
+                                            print(prefix + "   " + L.rstrip())
+                        else:
+                            print("\nFile preview:\n")
+                            print(textwrap.indent(s[:2000], "    "))
+                    except Exception:
+                        print("Failed to show context traceback:")
+                        traceback.print_exc()
+            print("\n" + "="*80)
+            if exit_code != 0:
+                print("One or more workflow files failed YAML parse.")
+                sys.exit(exit_code)
             else:
-                print("\nFile preview:\n")
-                print(textwrap.indent(s[:2000], "    "))
-        except Exception:
-            print("Failed to show context traceback:")
-            traceback.print_exc()
-print("\n" + "="*80)
-if exit_code != 0:
-    print("One or more workflow files failed YAML parse.")
-    sys.exit(exit_code)
-else:
-    print("All workflow YAML files parsed OK.")
-PY
+                print("All workflow YAML files parsed OK.")
+          PY
 
       - name: Fail on invalid YAML (if found)
         if: failure()
