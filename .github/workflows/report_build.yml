@@ -55,4 +55,4 @@ jobs:
     needs: build
     steps:
       - name: Report status
-        run: echo "Build finished with status: ${{ needs.build.result }}"
+        run: echo "Build finished with status:${{ needs.build.result }}"
