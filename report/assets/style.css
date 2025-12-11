@@ -25,6 +25,43 @@ h1 {
     font-size: 14px;
 }
 
+.drift-summary {
+    background: #f7fbff;
+    border-left: 4px solid #4a90e2;
+    padding: 12px;
+    margin-bottom: 18px;
+}
+
+.drift-metrics p {
+    font-size: 16px;
+    margin: 8px 0;
+}
+
+.tox-blocks {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.tox-block {
+    flex: 1;
+    background: #ffffff;
+    border: 1px solid #e6edf6;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.tox-block h3 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+}
+
+.muted {
+    color: #666;
+    font-size: 13px;
+    margin-left: 4px;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -34,10 +71,21 @@ table {
 table th, table td {
     border: 1px solid #ddd;
     padding: 8px;
+    vertical-align: top;
 }
 
 table th {
     background: #f0f0f0;
+}
+
+.text-preview {
+    max-width: 50%;
+    word-break: break-word;
+}
+
+.reason {
+    font-size: 13px;
+    color: #333;
 }
 
 .footer {
