@@ -10,45 +10,52 @@
     <div class="container">
         <h1>DriftMonitor – AI Safety Evaluation</h1>
         <p class="timestamp">Generated at: {{ timestamp }}</p>
-        <p>Total evaluated texts: <strong>{{ n_texts }}</strong></p>
 
+        <!-- Summary section (counts) -->
+        {% if summary %}
+        <section class="summary">
+            <h2>Daily Summary</h2>
+            <p>Total texts evaluated: <strong>{{ summary.n_texts }}</strong></p>
+            <div class="counts">
+                <h3>Sentiment counts</h3>
+                <ul>
+                {% for label, count in summary.label_counts.items() %}
+                    <li><strong>{{ label }}</strong>: {{ count }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+            <div class="risky">
+                <h3>Risk summary</h3>
+                <p>Safety threshold: {{ summary.safety_threshold }}</p>
+                <p>Number of risky items (safety_score &lt; threshold): <strong>{{ summary.n_risky }}</strong></p>
+                {% if summary.risky_examples %}
+                <h4>Top risky examples</h4>
+                <ol>
+                    {% for r in summary.risky_examples %}
+                    <li>
+                        <div class="risk-text">{{ r.text }}</div>
+                        <div class="risk-meta">score: {{ "%.3f"|format(r.safety_score) }} — {{ r.reason }}</div>
+                    </li>
+                    {% endfor %}
+                </ol>
+                {% endif %}
+            </div>
+        </section>
+        {% else %}
+          <p><em>No evaluation summary available yet.</em></p>
+        {% endif %}
+
+        <!-- Drift summary (if available) -->
         {% if drift_summary %}
         <section class="drift-summary">
             <h2>Drift Summary (latest)</h2>
             <p>Compared files: <strong>{{ drift_summary.eval_a }}</strong> vs <strong>{{ drift_summary.eval_b }}</strong></p>
-            <div class="drift-metrics">
-                <p><strong>Jensen–Shannon Divergence (normalized)</strong>: {{ "%.4f"|format(drift_summary.drift.jsd) }}</p>
-
-                <div class="tox-blocks">
-                    <div class="tox-block">
-                        <h3>Toxicity (A: {{ drift_summary.eval_a }})</h3>
-                        <ul>
-                            <li>n_texts: {{ drift_summary.toxicity_a.n_texts }}</li>
-                            <li>total_hits: {{ drift_summary.toxicity_a.total_hits }}</li>
-                            <li>avg_hits_per_text: {{ "%.3f"|format(drift_summary.toxicity_a.avg_hits_per_text) }}</li>
-                            <li>pct_with_hits: {{ "%.2f"|format(drift_summary.toxicity_a.pct_with_hits * 100) }}%</li>
-                        </ul>
-                    </div>
-                    <div class="tox-block">
-                        <h3>Toxicity (B: {{ drift_summary.eval_b }})</h3>
-                        <ul>
-                            <li>n_texts: {{ drift_summary.toxicity_b.n_texts }}</li>
-                            <li>total_hits: {{ drift_summary.toxicity_b.total_hits }}</li>
-                            <li>avg_hits_per_text: {{ "%.3f"|format(drift_summary.toxicity_b.avg_hits_per_text) }}</li>
-                            <li>pct_with_hits: {{ "%.2f"|format(drift_summary.toxicity_b.pct_with_hits * 100) }}%</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-        {% else %}
-        <section class="drift-summary">
-            <h2>Drift Summary</h2>
-            <p><em>No drift summary available yet. Run the weekly metrics workflow or the metrics runner to compute drift.</em></p>
+            <p><strong>Jensen–Shannon Divergence (normalized)</strong>: {{ "%.4f"|format(drift_summary.drift.jsd) }}</p>
         </section>
         {% endif %}
 
-        <h2>Safety Results</h2>
+        <!-- Full safety results preview -->
+        <h2>Safety Results (preview)</h2>
         <table>
             <thead>
                 <tr>
@@ -60,7 +67,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for item in items %}
+                {% for item in eval.safety_results %}
                 <tr>
                     <td class="text-preview">{{ item.text[:120] }}{% if item.text|length > 120 %}...{% endif %}</td>
                     <td>{{ item.sentiment_label }} <span class="muted">({{ "%.2f"|format(item.sentiment_score) }})</span></td>
@@ -72,9 +79,7 @@
             </tbody>
         </table>
 
-        <p class="footer">
-            DriftMonitor – AI Drift & Safety Monitoring System
-        </p>
+        <p class="footer">DriftMonitor – AI Drift & Safety Monitoring System</p>
     </div>
 </body>
 </html>
