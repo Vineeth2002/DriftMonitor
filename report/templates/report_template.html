@@ -12,11 +12,47 @@
         <p class="timestamp">Generated at: {{ timestamp }}</p>
         <p>Total evaluated texts: <strong>{{ n_texts }}</strong></p>
 
+        {% if drift_summary %}
+        <section class="drift-summary">
+            <h2>Drift Summary (latest)</h2>
+            <p>Compared files: <strong>{{ drift_summary.eval_a }}</strong> vs <strong>{{ drift_summary.eval_b }}</strong></p>
+            <div class="drift-metrics">
+                <p><strong>Jensen–Shannon Divergence (normalized)</strong>: {{ "%.4f"|format(drift_summary.drift.jsd) }}</p>
+
+                <div class="tox-blocks">
+                    <div class="tox-block">
+                        <h3>Toxicity (A: {{ drift_summary.eval_a }})</h3>
+                        <ul>
+                            <li>n_texts: {{ drift_summary.toxicity_a.n_texts }}</li>
+                            <li>total_hits: {{ drift_summary.toxicity_a.total_hits }}</li>
+                            <li>avg_hits_per_text: {{ "%.3f"|format(drift_summary.toxicity_a.avg_hits_per_text) }}</li>
+                            <li>pct_with_hits: {{ "%.2f"|format(drift_summary.toxicity_a.pct_with_hits * 100) }}%</li>
+                        </ul>
+                    </div>
+                    <div class="tox-block">
+                        <h3>Toxicity (B: {{ drift_summary.eval_b }})</h3>
+                        <ul>
+                            <li>n_texts: {{ drift_summary.toxicity_b.n_texts }}</li>
+                            <li>total_hits: {{ drift_summary.toxicity_b.total_hits }}</li>
+                            <li>avg_hits_per_text: {{ "%.3f"|format(drift_summary.toxicity_b.avg_hits_per_text) }}</li>
+                            <li>pct_with_hits: {{ "%.2f"|format(drift_summary.toxicity_b.pct_with_hits * 100) }}%</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% else %}
+        <section class="drift-summary">
+            <h2>Drift Summary</h2>
+            <p><em>No drift summary available yet. Run the weekly metrics workflow or the metrics runner to compute drift.</em></p>
+        </section>
+        {% endif %}
+
         <h2>Safety Results</h2>
         <table>
             <thead>
                 <tr>
-                    <th>Text</th>
+                    <th>Text (preview)</th>
                     <th>Sentiment</th>
                     <th>Toxicity</th>
                     <th>Safety Score</th>
@@ -26,11 +62,11 @@
             <tbody>
                 {% for item in items %}
                 <tr>
-                    <td>{{ item.text[:100] }}...</td>
-                    <td>{{ item.sentiment_label }} ({{ item.sentiment_score }})</td>
-                    <td>{{ item.toxicity_score }}</td>
-                    <td>{{ item.safety_score }}</td>
-                    <td>{{ item.reason }}</td>
+                    <td class="text-preview">{{ item.text[:120] }}{% if item.text|length > 120 %}...{% endif %}</td>
+                    <td>{{ item.sentiment_label }} <span class="muted">({{ "%.2f"|format(item.sentiment_score) }})</span></td>
+                    <td>{{ "%.2f"|format(item.toxicity_score) }}</td>
+                    <td>{{ "%.3f"|format(item.safety_score) }}</td>
+                    <td class="reason">{{ item.reason }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
