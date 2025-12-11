@@ -1,9 +1,9 @@
-name: Deploy Report to GitHub Pages (gh-pages)
+name: Deploy Report to gh-pages
 
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["Build Report (docs -> GitHub Pages)"]
+    workflows: ["Build Report (artifact)"]
     types:
       - completed
 
@@ -14,29 +14,28 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           persist-credentials: true
 
-      - name: Setup Python 3.11
-        uses: actions/setup-python@v5
+      - name: Download report artifact
+        uses: actions/download-artifact@v4
         with:
-          python-version: "3.11"
-
-      - name: Build if missing
-        run: |
-          if [ ! -f report/html/report.html ]; then
-            python -m driftmonitor.report.html.report_builder
-          fi
+          name: driftmonitor-report-html
+          path: report/html
 
       - name: Verify report
         run: |
-          test -f report/html/report.html
+          if [ ! -f report/html/report.html ]; then
+            echo "report/html/report.html not found"
+            ls -R report/html || true
+            exit 1
+          fi
 
-      - name: Backoff
+      - name: Small randomized backoff
         run: |
           sleep $(( (RANDOM % 6) + 2 ))
 
