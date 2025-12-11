@@ -1,0 +1,4 @@
+pytrends>=4.8.0   # optional; collector will fallback if missing
+pandas>=2.0       # useful in other modules; optional for collector
+PyYAML>=6.0
+pytest>=7.0
