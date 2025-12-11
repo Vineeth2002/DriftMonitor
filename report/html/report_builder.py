@@ -7,6 +7,7 @@ DriftMonitor HTML Report Builder (full file).
 - Renders template into report/html/report.html
 - Copies metrics JSON into report/html/assets/data/
 """
+
 import os
 import json
 import glob
@@ -34,6 +35,7 @@ def load_latest_json_by_pattern(dirpath: str, pattern: str):
         data["_source_file"] = os.path.basename(path)
         return data
     except Exception:
+
         return None
 
 def load_metrics_file(name: str):
@@ -59,9 +61,7 @@ def render_html():
 
     env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
     template = env.get_template("report_template.html")
-
-    html = template.render(
-        timestamp=datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+@@ -45,16 +65,28 @@ def render_html():
         eval=eval_data,
         summary=eval_summary,
         drift_summary=drift,
@@ -86,6 +86,7 @@ def render_html():
 
     logger.info("Saved HTML report → %s", output_path)
     return output_path
+
 
 if __name__ == "__main__":
     path = render_html()
