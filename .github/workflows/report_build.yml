@@ -7,7 +7,7 @@ name: Build Report (docs -> GitHub Pages)
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 2 * * *"   # runs daily at 02:00 UTC (adjust as needed)
+    - cron: "0 2 * * *"
 
 concurrency:
   group: report-build-${{ github.ref }}
@@ -58,8 +58,11 @@ jobs:
         run: |
           mkdir -p docs
           cp report/html/report.html docs/index.html
-          cp -r report/assets docs/ || true
-          # optionally copy other assets if needed
+          # copy assets if the template references them relative to docs/
+          if [ -d report/assets ]; then
+            rm -rf docs/assets || true
+            cp -r report/assets docs/
+          fi
 
       - name: Commit docs update
         run: |
@@ -80,6 +83,3 @@ jobs:
     steps:
       - name: Report status
         run: echo "Build finished with status: ${{ needs.build.result }}"
-
-  # Optional deploy job: if you want to trigger gh-pages deploy from here, enable.
-  # Note: If you use the separate deploy_pages.yml (below), you can disable this section.
