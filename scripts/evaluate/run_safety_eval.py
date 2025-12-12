@@ -1,31 +1,53 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
+
 from driftmonitor.benchmark.classifiers.safety_classifier import SafetyClassifier
 
-TODAY = datetime.utcnow().strftime("%Y-%m-%d")
-RAW_DIR = f"data/live/raw/{TODAY}"
-OUT_DIR = f"data/live/processed/{TODAY}"
-os.makedirs(OUT_DIR, exist_ok=True)
+RAW_BASE = "data/live/raw"
+PROC_BASE = "data/live/processed"
 
-clf = SafetyClassifier()
+def today_dir():
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
-results = []
+def load_json(path):
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-for file in os.listdir(RAW_DIR):
-    with open(os.path.join(RAW_DIR, file)) as f:
-        items = json.load(f)
+def save_json(path, data):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
-    texts = [i["title"] for i in items]
-    scores = clf.score_texts(texts)
+def main():
+    date = today_dir()
+    raw_dir = f"{RAW_BASE}/{date}"
+    out_dir = f"{PROC_BASE}/{date}"
 
-    for item, score in zip(items, scores):
-        results.append({
-            **item,
-            **score
-        })
+    os.makedirs(out_dir, exist_ok=True)
 
-with open(f"{OUT_DIR}/evaluated.json", "w") as f:
-    json.dump(results, f, indent=2)
+    classifier = SafetyClassifier()
 
-print(f"Evaluated {len(results)} items")
+    evaluated = []
+
+    for fname in ["google_trends.json", "hackernews.json"]:
+        path = f"{raw_dir}/{fname}"
+        if not os.path.exists(path):
+            continue
+
+        data = load_json(path)
+        texts = [r["text"] for r in data["results"]]
+
+        scores = classifier.score_texts(texts)
+
+        for r, s in zip(data["results"], scores):
+            evaluated.append({
+                **r,
+                **s,
+                "evaluated_at": datetime.now(timezone.utc).isoformat()
+            })
+
+    save_json(f"{out_dir}/evaluated.json", evaluated)
+    print(f"[EVALUATE] Saved {len(evaluated)} items")
+
+if __name__ == "__main__":
+    main()
