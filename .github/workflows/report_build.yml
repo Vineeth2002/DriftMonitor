@@ -1,4 +1,16 @@
- build:
+name: Build Report (docs -> GitHub Pages)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * *"
+
+concurrency:
+  group: report-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
     name: Build HTML Report
     runs-on: ubuntu-latest
     permissions:
@@ -10,53 +22,78 @@
         with:
           persist-credentials: true
 
-      - name: Setup Python 3.11
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install dependencies & package
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt || true
+          if [ -f setup.py ] || [ -f pyproject.toml ]; then
+            pip install -e .
+          else
+            pip install -r requirements.txt || true
+            echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
+          fi
           pip install jinja2 || true
 
-      - name: Install repository package (editable)
-
-
+      - name: Debug: repo & import
         run: |
-          python -m pip install --upgrade pip
-          if [ -f "pyproject.toml" ] || [ -f "setup.py" ]; then
-            python -m pip install -e .
-          else
-            echo "No pyproject/setup found — installing repo path to PYTHONPATH"
-            python - <<'PY'
-import os, sys
-p = os.getcwd()
-print("Adding repo root to PYTHONPATH:", p)
-sys.path.insert(0,p)
-print("done")
-PY
-          fi
-
-      - name: Debug: show repo tree and check driftmonitor import
-        run: |
-          echo "PWD: $(pwd)"
-          echo "--- top-level files ---"
           ls -la
-          echo "--- check driftmonitor directory ---"
-          if [ -d driftmonitor ]; then ls -la driftmonitor || true; else echo "driftmonitor not found"; fi
-          echo "--- python sys.path ---"
+          ls -la driftmonitor || true
           python - <<'PY'
-import sys, pkgutil, os
-print("sys.path:")
-for p in sys.path[:8]:
-    print(" ", p)
-print("\nfind_loader for 'driftmonitor':", pkgutil.find_loader('driftmonitor'))
-print("\nlisting root files in python:")
-print(os.listdir('.'))
+import sys, importlib
+print("Python:", sys.version.splitlines()[0])
+print("sys.path head:", sys.path[:6])
+try:
+    import driftmonitor
+    print("driftmonitor module OK:", getattr(driftmonitor, "__file__", "module"))
+except Exception as e:
+    print("IMPORT ERROR:", e)
+    raise
 PY
 
       - name: Build report
+        id: build-report
         run: |
+          set -e
           python -m driftmonitor.report.html.report_builder
+
+      - name: Verify report exists
+        run: |
+          if [ ! -f report/html/report.html ]; then
+            echo "Error: report/html/report.html not found"
+            ls -R report || true
+            exit 1
+          fi
+          echo "Report verified."
+
+      - name: Copy report to docs (for GitHub Pages)
+        run: |
+          mkdir -p docs
+          cp report/html/report.html docs/index.html
+          if [ -d report/assets ]; then
+            rm -rf docs/assets || true
+            cp -r report/assets docs/
+          fi
+
+      - name: Commit docs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/index.html docs/assets || true
+          if git diff --quiet --staged; then
+            echo "no changes"
+          else
+            git commit -m "Automated report update (docs)" || true
+            git push || echo "git push failed (permission)"
+          fi
+
+  report-build-status:
+    name: Report Build Status
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Report status
+        run: echo "Build finished with status: ${{ needs.build.result }}"
