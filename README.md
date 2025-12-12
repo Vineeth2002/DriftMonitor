@@ -27,7 +27,6 @@ The system is engineered to be:
 ## 🌐 Live Demo (GitHub Pages)
 
 👉 **https://vineeth2002.github.io/driftmonitor/**  
-(Enable via GitHub → Settings → Pages → source: `/docs`)
 
 ---
 
