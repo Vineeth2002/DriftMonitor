@@ -1,45 +1,77 @@
 name: Daily Evaluation
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'data/live/raw/**'
   schedule:
-    - cron: "30 1 * * *"   # run at 01:30 UTC (after collectors)
+    - cron: '0 2 * * *'   # fallback daily run at 02:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: evaluate-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   evaluate:
     name: Run Evaluation Pipeline
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install dependencies & package
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          # If setup.py exists, use editable install so 'import driftmonitor' works
+          if [ -f setup.py ] || [ -f pyproject.toml ]; then
+            pip install -e .
+          else
+            pip install -r requirements.txt || true
+            echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
+          fi
+          pip install jinja2 || true
+
+      - name: Debug: show repo & attempt import
+        run: |
+          echo "PWD: $(pwd)"
+          echo "Top-level files:"
+          ls -la
+          echo "driftmonitor folder (if present):"
+          ls -la driftmonitor || true
+          python - <<'PY'
+import sys, importlib
+print("Python:", sys.version.splitlines()[0])
+print("sys.path head:", sys.path[:6])
+try:
+    m = importlib.import_module("driftmonitor")
+    print("driftmonitor imported OK:", getattr(m, "__file__", repr(m)))
+except Exception as e:
+    print("DRIFTMONITOR IMPORT ERROR:", e)
+    raise
+PY
 
       - name: Run evaluation
         run: |
           echo "Running safety evaluation..."
           python -m driftmonitor.scripts.evaluate.run_evaluation
 
-      - name: Commit evaluation results
+      - name: Commit evaluation results (if any)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/live/processed || true
-          if git diff --cached --quiet; then
-            echo "No evaluation changes to commit."
+          if git diff --quiet --staged; then
+            echo "No new processed files to commit."
           else
-            git commit -m "Daily evaluation update (automated)"
-            git push
+            git commit -m "Automated evaluation results [ci skip]" || true
+            git push || echo "push failed (permissions?)"
           fi
