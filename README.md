@@ -105,6 +105,14 @@ flowchart TD
     - Weekly Aggregation
     - Monthly Aggregation"]
 
+    F --> G["Reporting Layer
+    Static HTML Dashboard"]
+
+    G --> H["GitHub Pages
+    Live Public Dashboard"]
+
+---
+
 
 # Clone the repository
 git clone https://github.com/Vineeth2002/driftmonitor
