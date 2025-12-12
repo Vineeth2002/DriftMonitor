@@ -1,3 +1,4 @@
+
 name: Build Report (docs -> GitHub Pages)
 
 on:
@@ -71,29 +72,3 @@ PY
 
       - name: Copy report to docs (for GitHub Pages)
         run: |
-          mkdir -p docs
-          cp report/html/report.html docs/index.html
-          if [ -d report/assets ]; then
-            rm -rf docs/assets || true
-            cp -r report/assets docs/
-          fi
-
-      - name: Commit docs
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/index.html docs/assets || true
-          if git diff --quiet --staged; then
-            echo "no changes"
-          else
-            git commit -m "Automated report update (docs)" || true
-            git push || echo "git push failed (permission)"
-          fi
-
-  report-build-status:
-    name: Report Build Status
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Report status
-        run: echo "Build finished with status: ${{ needs.build.result }}"
