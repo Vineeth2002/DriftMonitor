@@ -1,2 +1,7 @@
-# driftmonitor/__init__.py
-__version__ = "0.0.1"
+"""
+DriftMonitor
+
+AI Safety & Risk Drift Monitoring Platform
+"""
+
+__version__ = "1.0.0"
