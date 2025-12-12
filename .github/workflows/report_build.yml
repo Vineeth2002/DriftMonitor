@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-report:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -25,31 +25,27 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies and package
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
           pip install -e . || pip install -r requirements.txt || true
 
-      - name: Check processed data
+      - name: Build report safely
         run: |
           if [ ! -d data/live/processed ] || [ -z "$(ls -A data/live/processed 2>/dev/null)" ]; then
             echo "No processed data found. Skipping report build."
             exit 0
           fi
 
-      - name: Build HTML report
-        run: |
-          python -m driftmonitor.report.html.report_builder || true
-
-      - name: Check report output
-        run: |
-          if [ ! -f report/html/report.html ]; then
-            echo "Report not generated. Skipping."
-            exit 0
-          fi
+          python -m driftmonitor.report.html.report_builder || echo "Report build failed but workflow continues"
 
       - name: Copy report to docs
         run: |
+          if [ ! -f report/html/report.html ]; then
+            echo "No report generated. Skipping."
+            exit 0
+          fi
+
           mkdir -p docs
           cp report/html/report.html docs/index.html
 
@@ -57,10 +53,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add docs/index.html || true
-          if git diff --quiet --staged; then
-            echo "No report changes."
+
+          if git diff --cached --quiet; then
+            echo "No report changes"
           else
-            git commit -m "Automated report update [ci skip]"
+            git commit -m "Automated report update"
             git push
           fi
