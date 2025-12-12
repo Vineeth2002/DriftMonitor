@@ -1,5 +1,6 @@
 ---
-name: Deploy GitHub Pages
+name: Deploy Report to GitHub Pages
+
 on:
   workflow_dispatch:
   workflow_run:
@@ -7,21 +8,22 @@ on:
       - Build Report
     types:
       - completed
-concurrency:
-  group: deploy-pages-${{ github.ref }}
-  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Check report exists
+
+      - name: Check report existence
         run: |
           if [ ! -f report/html/report.html ]; then
             echo "No report found. Nothing to deploy."
             exit 0
           fi
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
