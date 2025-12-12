@@ -35,8 +35,6 @@ The system is designed to be:
 
 👉 **https://vineeth2002.github.io/driftmonitor/**  
 
-*(Enable via GitHub → Settings → Pages → Source: `/docs`)*
-
 ---
 
 ## ✨ Key Features
