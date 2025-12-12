@@ -2,11 +2,12 @@ name: Daily Evaluation
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
     paths:
       - 'data/live/raw/**'
   schedule:
-    - cron: '0 2 * * *'   # fallback daily run at 02:00 UTC
+    - cron: '0 2 * * *'
   workflow_dispatch:
 
 concurrency:
@@ -17,6 +18,7 @@ jobs:
   evaluate:
     name: Run Evaluation Pipeline
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -26,12 +28,11 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
       - name: Install dependencies & package
         run: |
           python -m pip install --upgrade pip
-          # If setup.py exists, use editable install so 'import driftmonitor' works
           if [ -f setup.py ] || [ -f pyproject.toml ]; then
             pip install -e .
           else
@@ -52,8 +53,8 @@ import sys, importlib
 print("Python:", sys.version.splitlines()[0])
 print("sys.path head:", sys.path[:6])
 try:
-    m = importlib.import_module("driftmonitor")
-    print("driftmonitor imported OK:", getattr(m, "__file__", repr(m)))
+    import driftmonitor
+    print("driftmonitor imported OK:", getattr(driftmonitor, "__file__", repr(driftmonitor)))
 except Exception as e:
     print("DRIFTMONITOR IMPORT ERROR:", e)
     raise
