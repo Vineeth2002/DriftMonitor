@@ -74,50 +74,30 @@ All outputs are committed to the repository for transparency and reproducibility
 
 ## 🏗 System Architecture
 
-┌──────────────────────────────────────────────┐
-│ GitHub Actions │
-│ (Scheduled & Manual Workflows) │
-└──────────────────────────┬───────────────────┘
+Public Data Sources
+(Google Trends, HackerNews)
 │
-┌──────────────────▼──────────────────┐
-│ Data Collectors │
-│ │
-│ • Google Trends (pytrends) │
-│ • HackerNews (Firebase API) │
-│ │
-│ Output: timestamped raw JSON │
-└──────────────────┬──────────────────┘
+▼
+Daily Collection (Actions)
 │
+▼
+Raw Data Storage
 data/live/raw/YYYY-MM-DD/
 │
-┌──────────────────▼──────────────────┐
-│ Safety Evaluation Layer │
-│ │
-│ • Sentiment analysis │
-│ • Toxicity detection │
-│ • Misuse / jailbreak patterns │
-│ │
-│ Output: safety scores + labels │
-└──────────────────┬──────────────────┘
+▼
+Safety Evaluation
+(sentiment + toxicity + misuse)
 │
+▼
+Processed Results
 data/live/processed/YYYY-MM-DD/
 │
-┌──────────────────▼──────────────────┐
-│ Metrics & Drift Analysis │
-│ │
-│ • Daily summaries │
-│ • Weekly aggregation │
-│ • Monthly aggregation │
-└──────────────────┬──────────────────┘
+┌─────┴─────────┐
+▼ ▼
+Weekly Aggregation Monthly Aggregation
 │
-┌──────────────────▼──────────────────┐
-│ Reporting Layer │
-│ │
-│ • Static HTML dashboard │
-│ • Daily / Weekly / Monthly views │
-│ │
-│ Auto-published via GitHub Pages │
-└──────────────────┬──────────────────┘
+▼
+HTML Dashboard
 ▼
 https://vineeth2002.github.io/driftmonitor/
 
