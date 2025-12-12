@@ -1,7 +1,27 @@
+# Python
 __pycache__/
-*.pyc
-.env
-data/live/processed/*
-report/html/*
-docs/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+
+# IDE / OS
 .vscode/
+.idea/
+.DS_Store
+
+# Environment variables
+.env
+
+# Model cache (transformers)
+.cache/
+huggingface/
+
+# Logs
+*.log
+
+# Do NOT ignore data or docs
+# data/
+# docs/
