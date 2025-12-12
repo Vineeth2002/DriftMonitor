@@ -53,7 +53,7 @@ jobs:
           echo "driftmonitor folder (if present):"
           ls -la driftmonitor || true
 
-          python - 'PY'
+          python - <<'PY'
 import sys, importlib
 print("Python:", sys.version.splitlines()[0])
 print("sys.path:", sys.path[:6])
