@@ -74,32 +74,24 @@ All outputs are committed to the repository for transparency and reproducibility
 
 ## 🏗 System Architecture
 
-Public Data Sources
-(Google Trends, HackerNews)
-│
-▼
-Daily Collection (Actions)
-│
-▼
-Raw Data Storage
-data/live/raw/YYYY-MM-DD/
-│
-▼
-Safety Evaluation
-(sentiment + toxicity + misuse)
-│
-▼
-Processed Results
-data/live/processed/YYYY-MM-DD/
-│
-┌─────┴─────────┐
-▼ ▼
-Weekly Aggregation Monthly Aggregation
-│
-▼
-HTML Dashboard
-▼
-https://vineeth2002.github.io/driftmonitor/
+```mermaid
+flowchart TD
+    A[GitHub Actions<br/>(Scheduled & Manual Triggers)]
+
+    A --> B[Data Collectors<br/>• Google Trends (pytrends)<br/>• HackerNews API]
+
+    B --> C[data/live/raw/YYYY-MM-DD/<br/>Raw JSON Snapshots]
+
+    C --> D[Safety Evaluation Layer<br/>• Sentiment Analysis<br/>• Toxicity Detection<br/>• Misuse / Jailbreak Detection]
+
+    D --> E[data/live/processed/YYYY-MM-DD/<br/>Safety Scores & Labels]
+
+    E --> F[Metrics & Drift Analysis<br/>• Daily Summaries<br/>• Weekly Aggregation<br/>• Monthly Aggregation]
+
+    F --> G[Reporting Layer<br/>Static HTML Dashboard]
+
+    G --> H[GitHub Pages<br/>Live Public Dashboard]
+
 
 ---
 
