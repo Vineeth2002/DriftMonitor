@@ -1,50 +1,36 @@
 import json
 import os
-import requests
-from datetime import datetime
-from pytrends.request import TrendReq
+from datetime import datetime, timezone
+
+from driftmonitor.collectors.google_trends.collector import collect_google_trends
+from driftmonitor.collectors.hackernews.collector import collect_hackernews
 
 BASE_DIR = "data/live/raw"
-TODAY = datetime.utcnow().strftime("%Y-%m-%d")
-OUT_DIR = os.path.join(BASE_DIR, TODAY)
-os.makedirs(OUT_DIR, exist_ok=True)
 
-def collect_google_trends():
-    pytrends = TrendReq(hl="en-US", tz=360)
-    pytrends.trending_searches(pn="india")
-    trends = pytrends.trending_searches(pn="india").head(10)[0].tolist()
+def today_dir():
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
-    data = [{
-        "source": "google_trends",
-        "title": t,
-        "collected_at": datetime.utcnow().isoformat()
-    } for t in trends]
+def ensure_dir(path):
+    os.makedirs(path, exist_ok=True)
 
-    with open(f"{OUT_DIR}/google_trends.json", "w") as f:
-        json.dump(data, f, indent=2)
+def save_json(path, data):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
-def collect_hackernews():
-    top_ids = requests.get(
-        "https://hacker-news.firebaseio.com/v0/topstories.json"
-    ).json()[:10]
+def main():
+    date = today_dir()
+    out_dir = os.path.join(BASE_DIR, date)
+    ensure_dir(out_dir)
 
-    items = []
-    for i in top_ids:
-        item = requests.get(
-            f"https://hacker-news.firebaseio.com/v0/item/{i}.json"
-        ).json()
-        if item and "title" in item:
-            items.append({
-                "source": "hackernews",
-                "title": item["title"],
-                "collected_at": datetime.utcnow().isoformat(),
-                "url": item.get("url")
-            })
+    print(f"[COLLECT] Saving raw data to {out_dir}")
 
-    with open(f"{OUT_DIR}/hackernews.json", "w") as f:
-        json.dump(items, f, indent=2)
+    google_data = collect_google_trends()
+    hn_data = collect_hackernews()
+
+    save_json(f"{out_dir}/google_trends.json", google_data)
+    save_json(f"{out_dir}/hackernews.json", hn_data)
+
+    print("[COLLECT] Done")
 
 if __name__ == "__main__":
-    collect_google_trends()
-    collect_hackernews()
-    print(f"Collected data for {TODAY}")
+    main()
