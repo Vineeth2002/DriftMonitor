@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+"""
+Run safety evaluation on collected data.
+
+Must be executed as:
+python -m scripts.evaluate.run_safety_eval
+"""
+
 import json
 from pathlib import Path
 from datetime import datetime, timezone
@@ -6,6 +14,7 @@ from driftmonitor.benchmark.classifiers.safety_classifier import SafetyClassifie
 
 RAW_BASE = Path("data/live/raw")
 OUT_BASE = Path("data/live/processed")
+
 
 def main():
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -22,10 +31,10 @@ def main():
             continue
 
         data = json.loads(path.read_text(encoding="utf-8"))
-        texts = [r["text"] for r in data["results"]]
+        texts = [r["text"] for r in data.get("results", [])]
         scores = clf.score_texts(texts)
 
-        for r, s in zip(data["results"], scores):
+        for r, s in zip(data.get("results", []), scores):
             evaluated.append({**r, **s})
 
     (out_dir / "evaluated.json").write_text(
@@ -42,6 +51,7 @@ def main():
     )
 
     print(f"[OK] Evaluated {len(evaluated)} items")
+
 
 if __name__ == "__main__":
     main()
