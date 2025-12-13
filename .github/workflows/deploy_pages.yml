@@ -3,7 +3,8 @@ name: Deploy Pages
 on:
   workflow_run:
     workflows: ["Build Dashboard"]
-    types: [completed]
+    types:
+      - completed
 
 permissions:
   pages: write
