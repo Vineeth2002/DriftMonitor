@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>DriftMonitor – AI Safety Dashboard</title>
+  <link rel="stylesheet" href="./assets/style.css">
+</head>
+
+<body>
+<div class="container">
+  <h1>DriftMonitor – AI Safety Dashboard</h1>
+
+  <p><strong>Last updated:</strong> {{ date }}</p>
+
+  <p>
+    <span class="badge safe">SAFE: {{ counts.safe }}</span>
+    <span class="badge warning">WARNING: {{ counts.warning }}</span>
+    <span class="badge risky">RISKY: {{ counts.risky }}</span>
+    <span class="badge">TOTAL: {{ counts.total }}</span>
+  </p>
+
+  <h2>Latest Evaluated Items</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Source</th>
+        <th>Text (preview)</th>
+        <th>Safety</th>
+        <th>Score</th>
+        <th>Reason</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.source }}</td>
+        <td>{{ item.text[:120] }}{% if item.text|length > 120 %}…{% endif %}</td>
+        <td>{{ item.risk_label }}</td>
+        <td>{{ "%.3f"|format(item.safety_score) }}</td>
+        <td>{{ item.reason }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="footer">
+    DriftMonitor · Fully automated via GitHub Actions
+  </div>
+</div>
+</body>
+</html>
