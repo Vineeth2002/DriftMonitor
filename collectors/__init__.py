@@ -1,7 +1,5 @@
 """
-DriftMonitor
+Collectors package.
 
-AI Drift & Safety Monitoring System
+Each collector fetches public data and returns a list of normalized items.
 """
-
-__version__ = "1.0.0"
