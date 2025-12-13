@@ -1,13 +1,14 @@
-name: Daily Evaluate
+name: Daily Evaluation
 
 on:
   schedule:
-    - cron: "40 19 * * *"   # 01:10 AM IST
+    - cron: "45 17 * * *"   # 11:15 PM IST
   workflow_dispatch:
 
 jobs:
   evaluate:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -15,19 +16,18 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install deps
-        run: pip install -r requirements.txt
+      - run: pip install -r requirements.txt
 
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
 
-      - name: Run evaluation
+      - name: Run safety evaluation
         run: python scripts/evaluate/run_safety_eval.py
 
-      - name: Commit processed data
+      - name: Commit evaluation data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/live/processed
-          git commit -m "data: daily evaluation $(date -u)" || echo "No changes"
+          git commit -m "Daily evaluation $(date -u)" || echo "No changes"
           git push
