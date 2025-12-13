@@ -2,7 +2,7 @@ name: Daily Collect
 
 on:
   schedule:
-    - cron: "0 2 * * *"
+    - cron: "45 15 * * *"
   workflow_dispatch:
 
 jobs:
