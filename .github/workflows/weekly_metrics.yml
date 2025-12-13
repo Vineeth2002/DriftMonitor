@@ -1,36 +1,23 @@
----
-name: Weekly Metrics Aggregation
+name: Weekly Metrics
 
 on:
   schedule:
-    - cron: "30 2 * * 0"   # Sunday
+    - cron: "0 16 * * 0"   # Sunday 9:30 PM IST
   workflow_dispatch:
 
 jobs:
   weekly:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.10"
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+      - run: pip install -r requirements.txt
 
-      - name: Run weekly aggregation
-        run: |
-          python scripts/metrics/weekly_metrics.py
-
-      - name: Commit weekly metrics
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/live/processed/weekly
-          git commit -m "Weekly metrics summary" || echo "No changes"
-          git push
+      - name: Run weekly metrics
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: python scripts/metrics/run_weekly_metrics.py
