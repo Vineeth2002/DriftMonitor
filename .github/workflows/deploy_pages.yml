@@ -1,0 +1,16 @@
+name: Deploy Pages
+
+on:
+  workflow_run:
+    workflows: ["Build Dashboard"]
+    types: [completed]
+
+permissions:
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/deploy-pages@v4
