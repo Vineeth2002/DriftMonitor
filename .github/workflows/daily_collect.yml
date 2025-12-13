@@ -2,7 +2,7 @@ name: Daily Collect
 
 on:
   schedule:
-    - cron: "45 15 * * *"   # 9:15 PM IST
+    - cron: "55 16 * * *"   # 10:15 PM IST
   workflow_dispatch:
 
 jobs:
