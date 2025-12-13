@@ -2,7 +2,7 @@ name: Daily Collect
 
 on:
   schedule:
-    - cron: "55 16 * * *"   # 10:15 PM IST
+    - cron: "10 17 * * *"   # 10:40 PM IST
   workflow_dispatch:
 
 jobs:
@@ -10,18 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.11"
 
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Install project package
+        run: pip install -e .
+
       - name: Run collectors
-        env:
-          PYTHONPATH: ${{ github.workspace }}
         run: python scripts/collect/run_collectors.py
+
+      - name: Commit collected data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/live/raw
+          git commit -m "Daily collect $(date -u)" || echo "No changes"
+          git push
