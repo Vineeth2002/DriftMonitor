@@ -1,1 +1,4 @@
+"""
+Collectors package for DriftMonitor.
+"""
 
