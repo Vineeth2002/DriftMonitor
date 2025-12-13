@@ -2,13 +2,12 @@ name: Weekly Metrics
 
 on:
   schedule:
-    - cron: "20 17 * * 0"   # Sunday 10:50 PM IST
+    - cron: "50 19 * * 0"   # Sunday 01:20 AM IST
   workflow_dispatch:
 
 jobs:
   weekly:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -17,12 +16,4 @@ jobs:
 
       - run: pip install -r requirements.txt
       - run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
-
       - run: python scripts/metrics/weekly_metrics.py
-
-      - run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/live/processed/weekly
-          git commit -m "chore: weekly metrics $(date -u)" || echo "No changes"
-          git push
