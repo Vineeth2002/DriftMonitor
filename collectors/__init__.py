@@ -1,4 +1,7 @@
 """
-Collectors package for DriftMonitor.
+DriftMonitor
+
+AI Drift & Safety Monitoring System
 """
 
+__version__ = "1.0.0"
