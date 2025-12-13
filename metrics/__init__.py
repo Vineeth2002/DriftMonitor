@@ -1,10 +1,6 @@
 """
 Metrics module for DriftMonitor.
 
-Includes:
-- drift metrics (JSD)
-- toxicity metrics
-- helpers for aggregation
+Provides daily, weekly, and monthly aggregation
+based on evaluated safety outputs.
 """
-
-__all__ = ["drift", "toxicity", "utils"]
