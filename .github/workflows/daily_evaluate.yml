@@ -2,7 +2,7 @@ name: Daily Evaluate
 
 on:
   schedule:
-    - cron: "45 17 * * *"   # 11:15 PM IST
+    - cron: "15 17 * * *"   # 10:45 PM IST
   workflow_dispatch:
 
 jobs:
@@ -19,13 +19,16 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Install project
+        run: pip install .
+
       - name: Run safety evaluation
         run: python scripts/evaluate/run_safety_eval.py
 
-      - name: Commit processed data
+      - name: Commit evaluation results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/live/processed
-          git commit -m "data: daily safety evaluation" || echo "No changes"
+          git commit -m "data: daily evaluation $(date -u)" || echo "No changes"
           git push
