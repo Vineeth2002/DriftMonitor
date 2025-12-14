@@ -14,13 +14,24 @@ FILES = {
     "Quarterly AI Risk Summary": BASE / "quarterly" / "quarterly_trends.csv",
 }
 
+# ---------- Required table schema ----------
+REQUIRED_COLUMNS = [
+    "date",
+    "category",
+    "total_words",
+    "risk_words",
+    "risk_percentage",
+    "severity",
+    "trend",
+]
+
 # ---------- Helpers ----------
-def load_df(path: Path):
+def load_df(path: Path) -> pd.DataFrame:
     if path.exists():
         return pd.read_csv(path)
     return pd.DataFrame()
 
-def render_table(df: pd.DataFrame):
+def render_table(df: pd.DataFrame) -> str:
     if df.empty:
         return """
         <table class="risk-table">
@@ -31,6 +42,20 @@ def render_table(df: pd.DataFrame):
             </tr>
         </table>
         """
+
+    # Ensure all required columns exist
+    for col in REQUIRED_COLUMNS:
+        if col not in df.columns:
+            df[col] = ""
+
+    # Enforce column order
+    df = df[REQUIRED_COLUMNS]
+
+    # Format percentage nicely
+    if "risk_percentage" in df.columns:
+        df["risk_percentage"] = df["risk_percentage"].apply(
+            lambda x: f"{x:.2f}" if isinstance(x, (int, float)) else x
+        )
 
     return df.to_html(
         index=False,
@@ -89,6 +114,7 @@ h1 {{
     color: #ffffff;
     padding: 10px;
     font-size: 14px;
+    text-align: left;
 }}
 
 .risk-table td {{
@@ -140,6 +166,7 @@ html += """
 
 <div class="guide">
     <h2>Severity Guide</h2>
+
     <p>🟢 <b>LOW</b><br>
        Risk &lt; 1%<br>
        Minimal AI risk signals</p>
@@ -153,17 +180,18 @@ html += """
        Elevated AI risk signals</p>
 
     <hr>
+
     <p><b>Trend</b><br>
-       🔺 Increase<br>
-       🔻 Decrease<br>
-       ➖ Stable / New</p>
+       🔺 UP – Risk increasing<br>
+       🔻 DOWN – Risk decreasing<br>
+       ➖ STABLE / NEW</p>
 </div>
 
 </div>
 
 <div class="footer">
 Last updated (UTC): {datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}<br>
-Sources: Google Trends, Hacker News<br>
+Sources: Google Trends, Hacker News, Policy & Regulation News<br>
 Pipeline: GitHub Actions (Automated)
 </div>
 
