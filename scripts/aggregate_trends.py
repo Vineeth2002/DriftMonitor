@@ -3,41 +3,18 @@ import glob
 import os
 
 files = glob.glob("data/evaluated/*.csv")
+df = pd.concat((pd.read_csv(f) for f in files), ignore_index=True)
 
-if not files:
-    print("No evaluated files found. Skipping aggregation.")
-    exit(0)
+df["date"] = pd.to_datetime(df["date"])
 
-dfs = []
+os.makedirs("data/history/weekly", exist_ok=True)
 
-for f in files:
-    try:
-        df = pd.read_csv(f)
-        if not df.empty:
-            dfs.append(df)
-    except Exception:
-        continue
+weekly = (
+    df.groupby([pd.Grouper(key="date", freq="W"), "category"])
+      .risk_score.sum()
+      .reset_index()
+)
 
-if not dfs:
-    print("No valid data to aggregate.")
-    exit(0)
+weekly.to_csv("data/history/weekly/weekly_trends.csv", index=False)
 
-df = pd.concat(dfs, ignore_index=True)
-
-df["date"] = pd.to_datetime(df["date"], errors="coerce")
-df["risk_score"] = pd.to_numeric(df["risk_score"], errors="coerce").fillna(0)
-
-def aggregate(freq, out_dir, out_file):
-    out = (
-        df.groupby([pd.Grouper(key="date", freq=freq), "category"])
-        .risk_score.sum()
-        .reset_index()
-    )
-    if out.empty:
-        return
-    os.makedirs(out_dir, exist_ok=True)
-    out.to_csv(os.path.join(out_dir, out_file), index=False)
-
-aggregate("W", "data/history/weekly", "weekly_trends.csv")
-aggregate("M", "data/history/monthly", "monthly_trends.csv")
-aggregate("Q", "data/history/quarterly", "quarterly_trends.csv")
+print("Weekly aggregation complete")
