@@ -1,0 +1,43 @@
+name: AI Safety Daily Pipeline
+
+on:
+  schedule:
+    - cron: "30 1 * * *"   # 07:00 IST
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Collect data
+      run: |
+        python scripts/collect_google_trends.py
+        python scripts/collect_hackernews.py
+
+    - name: Evaluate safety
+      run: python scripts/evaluate_safety.py
+
+    - name: Aggregate trends
+      run: python scripts/aggregate_trends.py
+
+    - name: Build dashboard
+      run: python scripts/build_dashboard.py
+
+    - name: Commit results
+      run: |
+        git config user.name "github-actions"
+        git config user.email "actions@github.com"
+        git add data docs
+        git commit -m "Daily automated update" || echo "No changes"
+        git push
