@@ -1,2 +1,5 @@
-date,risk_score
-2025-12-14,0
+date,category,risk_score
+2025-12-14,AI bias,0
+2025-12-14,AI misuse,0
+2025-12-14,AI regulation,0
+2025-12-14,AI safety,0
