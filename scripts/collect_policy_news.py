@@ -17,7 +17,6 @@ for url in FEEDS:
     for entry in feed.entries[:20]:
         title = entry.get("title", "")
         summary = entry.get("summary", "")
-
         text = f"{title} {summary}"
 
         records.append({
@@ -27,15 +26,16 @@ for url in FEEDS:
         })
 
 if not records:
-    print("No policy news collected.")
-    exit(0)
+    records.append({
+        "date": datetime.utcnow().date(),
+        "text": "No policy news available today",
+        "source": "policy_news"
+    })
 
 df = pd.DataFrame(records)
 
 os.makedirs("data/raw", exist_ok=True)
 today = datetime.utcnow().strftime("%Y-%m-%d")
+df.to_csv(f"data/raw/policy_news_{today}.csv", index=False)
 
-out_file = f"data/raw/policy_news_{today}.csv"
-df.to_csv(out_file, index=False)
-
-print(f"Policy news collected: {out_file}")
+print("Policy news collection complete")
