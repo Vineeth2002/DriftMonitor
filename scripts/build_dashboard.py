@@ -1,121 +1,108 @@
 import pandas as pd
-import os
+import glob
 from datetime import datetime
+import os
 
-BASE_DIR = "data/history"
-DOCS_DIR = "docs"
+DASHBOARD_PATH = "docs/index.html"
 
-os.makedirs(DOCS_DIR, exist_ok=True)
+def load_latest(path_pattern):
+    files = sorted(glob.glob(path_pattern))
+    if not files:
+        return None
+    return pd.read_csv(files[-1])
 
-def severity_logic(p):
-    if p > 30:
-        return "HIGH"
-    elif p > 10:
-        return "MEDIUM"
+def add_severity(df):
+    def severity(row):
+        if row["risk_percentage"] < 1:
+            return "🟢 LOW"
+        elif row["risk_percentage"] < 5:
+            return "🟡 MEDIUM"
+        else:
+            return "🔴 HIGH"
+
+    df["severity"] = df.apply(severity, axis=1)
+    return df
+
+def table_html(df):
+    return df.to_html(index=False, classes="risk-table", border=0)
+
+daily = load_latest("data/history/daily/*.csv")
+weekly = load_latest("data/history/weekly/*.csv")
+monthly = load_latest("data/history/monthly/*.csv")
+quarterly = load_latest("data/history/quarterly/*.csv")
+
+sections = []
+
+for title, data in [
+    ("Daily AI Risk Summary", daily),
+    ("Weekly AI Risk Summary", weekly),
+    ("Monthly AI Risk Summary", monthly),
+    ("Quarterly AI Risk Summary", quarterly),
+]:
+    if data is not None and not data.empty:
+        data = add_severity(data)
+        sections.append(f"<h2>{title}</h2>{table_html(data)}")
     else:
-        return "LOW"
-
-def build_table(df, time_col):
-    rows = []
-    total_words_all = df["total_words"].sum()
-    total_risk_all = df["risk_words"].sum()
-
-    for _, r in df.iterrows():
-        perc = (r["risk_words"] / r["total_words"] * 100) if r["total_words"] > 0 else 0
-        sev = severity_logic(perc)
-        rows.append(f"""
-        <tr class="{sev.lower()}">
-            <td>{r[time_col]}</td>
-            <td>{r['category']}</td>
-            <td>{r['total_words']}</td>
-            <td>{r['risk_words']}</td>
-            <td>{perc:.2f}%</td>
-            <td><span class="badge {sev.lower()}">{sev}</span></td>
-        </tr>
-        """)
-
-    return "\n".join(rows)
+        sections.append(f"<h2>{title}</h2><p>No data available yet.</p>")
 
 html = f"""
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 <title>AI Drift Monitor</title>
 <style>
 body {{
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: #f4f6f9;
-    margin: 0;
-    padding: 30px;
-    color: #212529;
+  font-family: Arial, sans-serif;
+  margin: 40px;
+  background: #ffffff;
+  color: #222;
 }}
 
-h1 {{
-    margin-bottom: 5px;
+h1 {{ margin-bottom: 5px; }}
+h2 {{ margin-top: 40px; }}
+
+.status {{
+  font-weight: bold;
+  margin-bottom: 20px;
 }}
 
-.subtitle {{
-    color: #6c757d;
-    margin-bottom: 30px;
+.legend {{
+  position: fixed;
+  right: 30px;
+  top: 100px;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  width: 260px;
 }}
 
-.section {{
-    background: white;
-    border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 30px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+.legend h3 {{
+  margin-top: 0;
 }}
 
-table {{
-    width: 100%;
-    border-collapse: collapse;
+.risk-table {{
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 10px;
 }}
 
-th {{
-    background: #212529;
-    color: white;
-    padding: 10px;
-    font-size: 13px;
+.risk-table th {{
+  background: #343a40;
+  color: white;
+  padding: 10px;
 }}
 
-td {{
-    padding: 9px;
-    text-align: center;
-    font-size: 13px;
+.risk-table td {{
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
 }}
 
-tr:nth-child(even) {{
-    background: #f8f9fa;
-}}
-
-.badge {{
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 12px;
-}}
-
-.low {{
-    background: #e6f4ea;
-    color: #0f5132;
-}}
-
-.medium {{
-    background: #fff3cd;
-    color: #664d03;
-}}
-
-.high {{
-    background: #f8d7da;
-    color: #842029;
-}}
-
-.footer {{
-    text-align: center;
-    font-size: 12px;
-    color: #6c757d;
-    margin-top: 40px;
+footer {{
+  margin-top: 50px;
+  font-size: 0.9em;
+  color: #555;
 }}
 </style>
 </head>
@@ -123,9 +110,29 @@ tr:nth-child(even) {{
 <body>
 
 <h1>AI Drift Monitor</h1>
-<div class="subtitle">
-Automated AI Safety Risk Monitoring · Table-based · Policy-ready
+<div class="status">Status: Automated monitoring active</div>
+
+<div class="legend">
+  <h3>Severity Guide</h3>
+  <p>🟢 <b>LOW</b><br>&lt; 1% risk words<br>Minimal AI risk</p>
+  <p>🟡 <b>MEDIUM</b><br>1–5% risk words<br>Moderate AI risk</p>
+  <p>🔴 <b>HIGH</b><br>&gt; 5% risk words<br>Elevated AI risk</p>
 </div>
+
+{''.join(sections)}
+
+<footer>
+<p>Last updated (UTC): {datetime.utcnow().isoformat()}</p>
+<p>Sources: Google Trends, Hacker News</p>
+<p>Pipeline: GitHub Actions (Fully Automated)</p>
+</footer>
+
+</body>
+</html>
 """
 
-# ---------
+os.makedirs("docs", exist_ok=True)
+with open(DASHBOARD_PATH, "w", encoding="utf-8") as f:
+    f.write(html)
+
+print("Dashboard built successfully")
