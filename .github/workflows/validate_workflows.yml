@@ -1,4 +1,4 @@
-name: Validate Workflow YAMLs
+name: Validate Workflows
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - ".github/workflows/*.yml"
 
 jobs:
-  lint:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
