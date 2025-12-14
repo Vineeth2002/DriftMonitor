@@ -2,109 +2,130 @@ import pandas as pd
 import os
 from datetime import datetime
 
+BASE_DIR = "data/history"
 DOCS_DIR = "docs"
-DATA_DIR = "data"
 
 os.makedirs(DOCS_DIR, exist_ok=True)
 
-html = []
-html.append("<html><head>")
-html.append("<title>Drift Monitor</title>")
-html.append("""
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
-    padding: 20px;
-}
-h1, h2 {
-    color: #222;
-}
-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-bottom: 30px;
-    background-color: white;
-}
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-}
-th {
-    background-color: #343a40;
-    color: white;
-}
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-.footer {
-    margin-top: 40px;
-    font-size: 12px;
-    color: #666;
-}
-</style>
-""")
-html.append("</head><body>")
-
-html.append("<h1>AI Drift Monitor</h1>")
-html.append("<p><b>Status:</b> Automated monitoring active</p>")
-
-# -------------------------
-# 1. Latest evaluation
-# -------------------------
-html.append("<h2>Latest AI Safety Signals</h2>")
-
-evaluated_files = sorted(
-    [f for f in os.listdir("data/evaluated") if f.endswith(".csv")],
-    reverse=True
-)
-
-if evaluated_files:
-    df_latest = pd.read_csv(f"data/evaluated/{evaluated_files[0]}")
-    if df_latest.empty:
-        html.append("<p>No risk signals detected in latest run.</p>")
+def severity_logic(p):
+    if p > 30:
+        return "HIGH"
+    elif p > 10:
+        return "MEDIUM"
     else:
-        html.append(df_latest.to_html(index=False))
-else:
-    html.append("<p>No evaluation data available yet.</p>")
+        return "LOW"
 
-# -------------------------
-# 2. Weekly trends
-# -------------------------
-html.append("<h2>Weekly Risk Trends</h2>")
-weekly_path = "data/history/weekly/weekly_trends.csv"
+def build_table(df, time_col):
+    rows = []
+    total_words_all = df["total_words"].sum()
+    total_risk_all = df["risk_words"].sum()
 
-if os.path.exists(weekly_path):
-    df_weekly = pd.read_csv(weekly_path)
-    html.append(df_weekly.to_html(index=False))
-else:
-    html.append("<p>Weekly aggregation not available yet.</p>")
+    for _, r in df.iterrows():
+        perc = (r["risk_words"] / r["total_words"] * 100) if r["total_words"] > 0 else 0
+        sev = severity_logic(perc)
+        rows.append(f"""
+        <tr class="{sev.lower()}">
+            <td>{r[time_col]}</td>
+            <td>{r['category']}</td>
+            <td>{r['total_words']}</td>
+            <td>{r['risk_words']}</td>
+            <td>{perc:.2f}%</td>
+            <td><span class="badge {sev.lower()}">{sev}</span></td>
+        </tr>
+        """)
 
-# -------------------------
-# 3. Monthly trends
-# -------------------------
-html.append("<h2>Monthly Risk Trends</h2>")
-monthly_path = "data/history/monthly/monthly_trends.csv"
+    return "\n".join(rows)
 
-if os.path.exists(monthly_path):
-    df_monthly = pd.read_csv(monthly_path)
-    html.append(df_monthly.to_html(index=False))
-else:
-    html.append("<p>Monthly aggregation not available yet.</p>")
+html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI Drift Monitor</title>
+<style>
+body {{
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 30px;
+    color: #212529;
+}}
 
-# -------------------------
-# Footer
-# -------------------------
-html.append("<div class='footer'>")
-html.append(f"Last updated (UTC): {datetime.utcnow()}<br>")
-html.append("Sources: Google Trends, Hacker News<br>")
-html.append("Pipeline: GitHub Actions (Automated)")
-html.append("</div>")
+h1 {{
+    margin-bottom: 5px;
+}}
 
-html.append("</body></html>")
+.subtitle {{
+    color: #6c757d;
+    margin-bottom: 30px;
+}}
 
-with open("docs/index.html", "w", encoding="utf-8") as f:
-    f.write("\n".join(html))
+.section {{
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}}
 
-print("Dashboard built successfully")
+table {{
+    width: 100%;
+    border-collapse: collapse;
+}}
+
+th {{
+    background: #212529;
+    color: white;
+    padding: 10px;
+    font-size: 13px;
+}}
+
+td {{
+    padding: 9px;
+    text-align: center;
+    font-size: 13px;
+}}
+
+tr:nth-child(even) {{
+    background: #f8f9fa;
+}}
+
+.badge {{
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 12px;
+}}
+
+.low {{
+    background: #e6f4ea;
+    color: #0f5132;
+}}
+
+.medium {{
+    background: #fff3cd;
+    color: #664d03;
+}}
+
+.high {{
+    background: #f8d7da;
+    color: #842029;
+}}
+
+.footer {{
+    text-align: center;
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 40px;
+}}
+</style>
+</head>
+
+<body>
+
+<h1>AI Drift Monitor</h1>
+<div class="subtitle">
+Automated AI Safety Risk Monitoring · Table-based · Policy-ready
+</div>
+"""
+
+# ---------
