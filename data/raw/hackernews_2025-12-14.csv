@@ -1,13 +1,14 @@
 id,title,score,comments,time
-46262816,AI and the ironies of automation – Part 2,105,31,2025-12-14 13:19:15
-46262950,"Apple Maps claims it's 29,905 miles away",99,66,2025-12-14 13:45:41
-46262021,Shai-Hulud compromised a dev machine and raided GitHub org access: a post-mortem,69,42,2025-12-14 10:07:00
-46261998,"Willison on Merchant's ""Copywriters reveal how AI has decimated their industry""",50,35,2025-12-14 10:01:25
-46223617,Show HN: Cargo-rail: graph-aware monorepo tooling for Rust; 11 deps,27,2,2025-12-10 20:49:22
-46258163,Recovering Anthony Bourdain's Li.st's,262,121,2025-12-13 21:18:01
-46203477,Building a Modern C64 Assembly AI Toolchain,24,4,2025-12-09 10:49:38
-46262545,The Gorman Paradox: Where Are All the AI-Generated Apps?,101,141,2025-12-14 12:18:59
+46262816,AI and the ironies of automation – Part 2,113,35,2025-12-14 13:19:15
+46262950,"Apple Maps claims it's 29,905 miles away",104,69,2025-12-14 13:45:41
+46262021,Shai-Hulud compromised a dev machine and raided GitHub org access: a post-mortem,72,48,2025-12-14 10:07:00
+46263874,"AI was not invented, it arrived",4,3,2025-12-14 15:47:59
+46223617,Show HN: Cargo-rail: graph-aware monorepo tooling for Rust; 11 deps,29,2,2025-12-10 20:49:22
+46258163,Recovering Anthony Bourdain's Li.st's,263,122,2025-12-13 21:18:01
+46203477,Building a Modern C64 Assembly AI Toolchain,26,5,2025-12-09 10:49:38
+46261998,"Willison on Merchant's ""Copywriters reveal how AI has decimated their industry""",56,44,2025-12-14 10:01:25
 46217126,Create a Markdown Editor in Ruby on Rails,35,4,2025-12-10 12:50:46
-46257339,VPN location claims don't match real traffic exits,444,279,2025-12-13 19:46:19
-46255285,Ask HN: How can I get better at using AI for programming?,394,398,2025-12-13 15:37:16
-46260106,"If a Meta AI model can read a brain-wide signal, why wouldn't the brain?",125,76,2025-12-14 01:43:33
+46262545,The Gorman Paradox: Where Are All the AI-Generated Apps?,103,147,2025-12-14 12:18:59
+46257339,VPN location claims don't match real traffic exits,445,279,2025-12-13 19:46:19
+46255285,Ask HN: How can I get better at using AI for programming?,395,398,2025-12-13 15:37:16
+46260106,"If a Meta AI model can read a brain-wide signal, why wouldn't the brain?",126,79,2025-12-14 01:43:33
