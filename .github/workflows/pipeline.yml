@@ -36,7 +36,10 @@ jobs:
       - name: Evaluate AI safety signals
         run: python scripts/evaluate_safety.py
 
-      - name: Aggregate trends
+      - name: Aggregate Daily
+        run: python scripts/aggregate_daily.py
+
+      - name: Aggregate Weekly / Monthly / Quarterly
         run: python scripts/aggregate_trends.py
 
       - name: Build dashboard
