@@ -1,15 +1,13 @@
 id,title,score,comments,time
-46262816,AI and the ironies of automation – Part 2,122,41,2025-12-14 13:19:15
-46262950,"Apple Maps claims it's 29,905 miles away",107,74,2025-12-14 13:45:41
-46264492,Hashcards: A Plain-Text Spaced Repetition System,4,0,2025-12-14 16:55:29
-46262021,Shai-Hulud compromised a dev machine and raided GitHub org access: a post-mortem,75,48,2025-12-14 10:07:00
-46263874,"AI was not invented, it arrived",16,18,2025-12-14 15:47:59
-46223617,Show HN: Cargo-rail: graph-aware monorepo tooling for Rust; 11 deps,29,2,2025-12-10 20:49:22
-46258163,Recovering Anthony Bourdain's Li.st's,264,122,2025-12-13 21:18:01
-46203477,Building a Modern C64 Assembly AI Toolchain,26,5,2025-12-09 10:49:38
-46261998,"Willison on Merchant's ""Copywriters reveal how AI has decimated their industry""",63,46,2025-12-14 10:01:25
-46262545,The Gorman Paradox: Where Are All the AI-Generated Apps?,110,152,2025-12-14 12:18:59
+46264492,Hashcards: A Plain-Text Spaced Repetition System,30,4,2025-12-14 16:55:29
+46262816,AI and the ironies of automation – Part 2,139,45,2025-12-14 13:19:15
+46262021,Shai-Hulud compromised a dev machine and raided GitHub org access: a post-mortem,88,54,2025-12-14 10:07:00
+46262950,"Apple Maps claims it's 29,905 miles away",113,86,2025-12-14 13:45:41
+46223617,Show HN: Cargo-rail: graph-aware monorepo tooling for Rust; 11 deps,33,2,2025-12-10 20:49:22
+46258163,Recovering Anthony Bourdain's Li.st's,268,123,2025-12-13 21:18:01
+46203477,Building a Modern C64 Assembly AI Toolchain,30,5,2025-12-09 10:49:38
 46217126,Create a Markdown Editor in Ruby on Rails,35,4,2025-12-10 12:50:46
-46257339,VPN location claims don't match real traffic exits,446,280,2025-12-13 19:46:19
-46255285,Ask HN: How can I get better at using AI for programming?,396,400,2025-12-13 15:37:16
-46260106,"If a Meta AI model can read a brain-wide signal, why wouldn't the brain?",126,80,2025-12-14 01:43:33
+46257339,VPN location claims don't match real traffic exits,446,281,2025-12-13 19:46:19
+46255285,Ask HN: How can I get better at using AI for programming?,400,402,2025-12-13 15:37:16
+46262545,The Gorman Paradox: Where Are All the AI-Generated Apps?,114,160,2025-12-14 12:18:59
+46260106,"If a Meta AI model can read a brain-wide signal, why wouldn't the brain?",127,81,2025-12-14 01:43:33
