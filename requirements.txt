@@ -1,4 +1,4 @@
 pandas
 requests
 pytrends
-plotly
+beautifulsoup4
