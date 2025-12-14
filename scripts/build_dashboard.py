@@ -54,3 +54,15 @@ if df.empty:
     exit(0)
 
 # -----------------------------
+# Case 3: Normal dashboard
+# -----------------------------
+fig = px.line(
+    df,
+    x="date",
+    y="risk_score",
+    color="category",
+    title="AI Safety Risk Trends (Weekly)"
+)
+
+fig.write_html(OUTPUT_FILE)
+print("[SUCCESS] Dashboard generated with data.")
