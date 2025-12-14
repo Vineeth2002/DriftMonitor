@@ -1,6 +1,5 @@
 name: AI Safety Daily Pipeline
 
-# IMPORTANT: allow GitHub Actions to push commits
 permissions:
   contents: write
 
@@ -34,7 +33,10 @@ jobs:
       - name: Evaluate safety
         run: python scripts/evaluate_safety.py
 
-      - name: Aggregate trends
+      - name: Aggregate daily trends
+        run: python scripts/aggregate_daily.py
+
+      - name: Aggregate weekly/monthly trends
         run: python scripts/aggregate_trends.py
 
       - name: Build dashboard
