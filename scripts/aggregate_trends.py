@@ -1,58 +1,55 @@
 import pandas as pd
-import glob
 import os
 
-# Load evaluated files
-files = glob.glob("data/evaluated/*.csv")
-if not files:
-    print("No evaluated data found.")
-    exit(0)
+INPUT = "data/history/daily/daily_trends.csv"
+BASE_DIR = "data/history"
 
-df = pd.concat((pd.read_csv(f) for f in files), ignore_index=True)
+df = pd.read_csv(INPUT)
 df["date"] = pd.to_datetime(df["date"])
 
-# Assume each row ≈ one text unit
-df["total_words"] = 1
-df["risk_words"] = df["risk_score"]
+def aggregate(freq, folder):
+    out_dir = f"{BASE_DIR}/{folder}"
+    os.makedirs(out_dir, exist_ok=True)
 
-def add_severity(df):
-    df["risk_percentage"] = (df["risk_words"] / df["total_words"]) * 100
+    agg = (
+        df.groupby([pd.Grouper(key="date", freq=freq), "category"])
+          .agg(
+              total_words=("total_words", "sum"),
+              risk_words=("risk_words", "sum")
+          )
+          .reset_index()
+    )
+
+    agg["risk_percentage"] = (
+        agg["risk_words"] / agg["total_words"] * 100
+    ).round(2)
+
+    agg = agg.sort_values(["category", "date"])
+    agg["delta"] = agg.groupby("category")["risk_percentage"].diff().round(2)
+
+    def trend_symbol(x):
+        if pd.isna(x) or x == 0:
+            return "➖ 0.0%"
+        elif x > 0:
+            return f"🔺 +{x}%"
+        else:
+            return f"🔻 {x}%"
+
+    agg["trend"] = agg["delta"].apply(trend_symbol)
 
     def severity(p):
         if p < 1:
-            return "LOW"
+            return "🟢 LOW"
         elif p <= 5:
-            return "MEDIUM"
+            return "🟡 MEDIUM"
         else:
-            return "HIGH"
+            return "🔴 HIGH"
 
-    df["severity"] = df["risk_percentage"].apply(severity)
-    return df
+    agg["severity"] = agg["risk_percentage"].apply(severity)
 
-def aggregate(freq, out_dir, filename):
-    agg = (
-        df.groupby([pd.Grouper(key="date", freq=freq), "category"])
-        .agg(
-            total_words=("total_words", "sum"),
-            risk_words=("risk_words", "sum")
-        )
-        .reset_index()
-    )
+    agg.to_csv(f"{out_dir}/{folder}_trends.csv", index=False)
+    print(f"{folder.capitalize()} trends saved")
 
-    agg = add_severity(agg)
-    os.makedirs(out_dir, exist_ok=True)
-    agg.to_csv(f"{out_dir}/{filename}", index=False)
-
-# DAILY
-aggregate("D", "data/history/daily", "daily_summary.csv")
-
-# WEEKLY
-aggregate("W", "data/history/weekly", "weekly_summary.csv")
-
-# MONTHLY
-aggregate("M", "data/history/monthly", "monthly_summary.csv")
-
-# QUARTERLY
-aggregate("Q", "data/history/quarterly", "quarterly_summary.csv")
-
-print("Aggregation completed successfully")
+aggregate("W", "weekly")
+aggregate("M", "monthly")
+aggregate("Q", "quarterly")
