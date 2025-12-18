@@ -1,5 +1,5 @@
 date,category,total_words,risk_words,risk_percentage,severity,trend
-2025-12-31,AI bias,3902,0,0.0,🟢 LOW,➖
-2025-12-31,AI misuse,3902,0,0.0,🟢 LOW,➖
-2025-12-31,AI regulation,3902,15,0.10543126170347808,🟢 LOW,➖
-2025-12-31,AI safety,3902,4,0.013562127737010802,🟢 LOW,➖
+2025-12-31,AI bias,3893,0,0.0,🟢 LOW,➖
+2025-12-31,AI misuse,3893,0,0.0,🟢 LOW,➖
+2025-12-31,AI regulation,3893,15,0.10545344571989426,🟢 LOW,➖
+2025-12-31,AI safety,3893,4,0.013564346138652419,🟢 LOW,➖
