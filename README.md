@@ -87,8 +87,7 @@ flowchart TD
 
     A --> B["Data Collectors
     - Google Trends (pytrends)
-    - HackerNews API
-    - Policy news"]
+    - HackerNews API"]
 
     B --> C["Raw Data Storage
     data/live/raw/YYYY-MM-DD"]
