@@ -1611,6 +1611,10 @@ date,category,total_words,risk_words,risk_percentage,severity
 2025-12-28,AI regulation,4,0,0.0,🟢 LOW
 2025-12-28,AI bias,4,0,0.0,🟢 LOW
 2025-12-28,AI misuse,4,0,0.0,🟢 LOW
+2025-12-28,AI safety,14,0,0.0,🟢 LOW
+2025-12-28,AI regulation,14,0,0.0,🟢 LOW
+2025-12-28,AI bias,14,0,0.0,🟢 LOW
+2025-12-28,AI misuse,14,0,0.0,🟢 LOW
 2025-12-28,AI safety,1,0,0.0,🟢 LOW
 2025-12-28,AI regulation,1,0,0.0,🟢 LOW
 2025-12-28,AI bias,1,0,0.0,🟢 LOW
@@ -2423,10 +2427,6 @@ date,category,total_words,risk_words,risk_percentage,severity
 2025-12-28,AI regulation,10,0,0.0,🟢 LOW
 2025-12-28,AI bias,10,0,0.0,🟢 LOW
 2025-12-28,AI misuse,10,0,0.0,🟢 LOW
-2025-12-28,AI safety,1,0,0.0,🟢 LOW
-2025-12-28,AI regulation,1,0,0.0,🟢 LOW
-2025-12-28,AI bias,1,0,0.0,🟢 LOW
-2025-12-28,AI misuse,1,0,0.0,🟢 LOW
 2025-12-28,AI safety,1,0,0.0,🟢 LOW
 2025-12-28,AI regulation,1,0,0.0,🟢 LOW
 2025-12-28,AI bias,1,0,0.0,🟢 LOW
