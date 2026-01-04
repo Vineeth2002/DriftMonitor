@@ -14,4 +14,4 @@ date,category,total_words,risk_words,risk_percentage,severity,trend
 2026-01-04,AI bias,33120,0,0.0,🟢 LOW,➖
 2026-01-04,AI misuse,33120,7,0.0040336397073004,🟢 LOW,➖
 2026-01-04,AI regulation,33120,154,0.11483610213436461,🟢 LOW,➖
-2026-01-04,AI safety,33120,37,0.0201120252462794,🟢 LOW,➖
+2026-01-04,AI safety,33120,38,0.02060512393503027,🟢 LOW,➖
